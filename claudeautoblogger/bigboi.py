@@ -5,6 +5,7 @@ import signal
 import sys
 import csv
 import requests
+import re
 
 # Setup KeyboardInterrupt handling
 def signal_handler(signal, frame):
@@ -107,7 +108,7 @@ def perplexity_chat_completion(messages, api_key):
         "Authorization": f"Bearer {api_key}"
     }
     payload = {
-        "model": "mistral-7b-instruct",
+        "model": "llama-3-sonar-large-32k-online",
         "messages": messages
     }
     print("Sending request to Perplexity API...")
@@ -118,6 +119,13 @@ def perplexity_chat_completion(messages, api_key):
         return response.json()["choices"][0]["message"]["content"]
     else:
         raise Exception(f"Perplexity API request failed with status code {response.status_code}: {response.text}")
+
+def scrape_image_urls(perplexity_info):
+    image_urls = []
+    matches = re.findall(r'\[(\d+)\]\s*(https?://\S+)', perplexity_info)
+    for match in matches:
+        image_urls.append(match[1])
+    return image_urls
 
 if __name__ == "__main__":
     output_file = "generated_content.csv"
@@ -140,11 +148,19 @@ if __name__ == "__main__":
             else:
                 print("Perplexity API not used.")
 
+            scraped_data = ""
+            if perplexity_info:
+                image_urls = scrape_image_urls(perplexity_info)
+                scraped_data = "\n".join(image_urls)
+
             user_prompt = f"""
-            DO NOT INCLUDE ANY EXTERNAL LINKS TO COMPETITORS. Include internal links from {image_urls_file_path} Start writing immediately with <h1> DO NOT START BY TALKING TO ME.  Please write a long-form SEO-optimized article with 1500 words about the following keyword: {keyword}. Answer in HTML, starting with one single <h1> tag, as this is going on wordpress, do not give unecessary HTML tags. Please use a lot of formatting, tables are great for ranking on Google. Always include a key takeaways table at the top giving the key information for this topic at the very top of the article.
+            You are writing for {brand_name}. Write from the perspective of this brand.  DO NOT INCLUDE ANY EXTERNAL LINKS TO COMPETITORS. Include internal links from {image_urls_file_path} Start writing immediately with <h1> DO NOT START BY TALKING TO ME.  Please write a long-form SEO-optimized article with 1500 words about the following keyword: {keyword}. Answer in HTML, starting with one single <h1> tag, as this is going on wordpress, do not give unecessary HTML tags. Please use a lot of formatting, tables are great for ranking on Google. Always include a key takeaways table at the top giving the key information for this topic at the very top of the article.
 
             Include the following information from Perplexity AI:
             {perplexity_info}
+
+            Include the following scraped data:
+            {scraped_data}
 
             The article should be written in a {article_tone} tone and framed as {article_framing}.
             Incorporate the brand guidelines:
