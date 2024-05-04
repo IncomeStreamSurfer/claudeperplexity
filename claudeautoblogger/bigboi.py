@@ -154,7 +154,7 @@ if __name__ == "__main__":
                 scraped_data = "\n".join(image_urls)
 
             user_prompt = f"""
-            You are writing for {brand_name}. Write from the perspective of this brand.  DO NOT INCLUDE ANY EXTERNAL LINKS TO COMPETITORS. Include internal links from {image_urls_file_path} Start writing immediately with <h1> DO NOT START BY TALKING TO ME.  Please write a long-form SEO-optimized article with 1500 words about the following keyword: {keyword}. Answer in HTML, starting with one single <h1> tag, as this is going on wordpress, do not give unecessary HTML tags. Please use a lot of formatting, tables are great for ranking on Google. Always include a key takeaways table at the top giving the key information for this topic at the very top of the article.
+            Use {perplexity_info} to inform all of your decisions and claims. You are writing for {brand_name}. Write from the perspective of this brand.  DO NOT INCLUDE ANY EXTERNAL LINKS TO COMPETITORS. Include internal links from {image_urls_file_path} Start writing immediately with <h1> DO NOT START BY TALKING TO ME.  Please write a long-form SEO-optimized article with 1500 words about the following keyword: {keyword}. Answer in HTML, starting with one single <h1> tag, as this is going on wordpress, do not give unecessary HTML tags. Please use a lot of formatting, tables are great for ranking on Google. Always include a key takeaways table at the top giving the key information for this topic at the very top of the article.
 
             Include the following information from Perplexity AI:
             {perplexity_info}
@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
             print(f"User prompt: {user_prompt}")
 
-            content = generate_content("System Prompt Here", user_prompt, anthropic_api_key)
+            content = generate_content(f"Use {perplexity_info} as closely as possible", user_prompt, anthropic_api_key)
 
             if content:
                 if isinstance(content, list):
