@@ -59,6 +59,6 @@ def main(sitemap_url, output_file):
     print(f"Image URLs and their corresponding page URLs have been saved to {output_file}")
 
 if __name__ == '__main__':
-    sitemap_url = 'https://isuit.it/sitemaps/google_sitemap_categories_brand_en.xml'
+    sitemap_url = 'ADD_YOUR_SITEMAP_HERE'
     output_file = 'image_urls.csv'
     main(sitemap_url, output_file)
